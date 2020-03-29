@@ -1,123 +1,98 @@
-/*
-	Stellar by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-*/
+jQuery(function($) {
+    //typewrite effect
+    var TxtType = function(el, toRotate, period) {
+        this.toRotate = toRotate;
+        this.el = el;
+        this.loopNum = 0;
+        this.period = parseInt(period, 10) || 2000;
+        this.txt = "";
+        this.tick();
+        this.isDeleting = false;
+    };
 
-(function($) {
+    TxtType.prototype.tick = function() {
+        var i = this.loopNum % this.toRotate.length;
+        var fullTxt = this.toRotate[i];
 
-	var	$window = $(window),
-		$body = $('body'),
-		$main = $('#main');
+        if (this.isDeleting) {
+            this.txt = fullTxt.substring(0, this.txt.length - 1);
+        } else {
+            this.txt = fullTxt.substring(0, this.txt.length + 1);
+        }
 
-	// Breakpoints.
-		breakpoints({
-			xlarge:   [ '1281px',  '1680px' ],
-			large:    [ '981px',   '1280px' ],
-			medium:   [ '737px',   '980px'  ],
-			small:    [ '481px',   '736px'  ],
-			xsmall:   [ '361px',   '480px'  ],
-			xxsmall:  [ null,      '360px'  ]
-		});
+        this.el.innerHTML = '<span class="intro__cursor">' + this.txt + "</span>";
 
-	// Play initial animations on page load.
-		$window.on('load', function() {
-			window.setTimeout(function() {
-				$body.removeClass('is-preload');
-			}, 100);
-		});
+        var that = this;
+        var delta = 200 - Math.random() * 100;
 
-	// Nav.
-		var $nav = $('#nav');
+        if (this.isDeleting) {
+            delta /= 2;
+        }
 
-		if ($nav.length > 0) {
+        if (!this.isDeleting && this.txt === fullTxt) {
+            delta = this.period;
+            this.isDeleting = true;
+        } else if (this.isDeleting && this.txt === "") {
+            this.isDeleting = false;
+            this.loopNum++;
+            delta = 500;
+        }
 
-			// Shrink effect.
-				$main
-					.scrollex({
-						mode: 'top',
-						enter: function() {
-							$nav.addClass('alt');
-						},
-						leave: function() {
-							$nav.removeClass('alt');
-						},
-					});
+        setTimeout(function() {
+            that.tick();
+        }, delta);
+    };
 
-			// Links.
-				var $nav_a = $nav.find('a');
+    window.onload = function() {
+        var elements = document.getElementsByClassName("typewrite");
+        for (var i = 0; i < elements.length; i++) {
+            var toRotate = elements[i].getAttribute("data-type");
+            var period = elements[i].getAttribute("data-period");
+            if (toRotate) {
+                new TxtType(elements[i], JSON.parse(toRotate), period);
+            }
+        }
+        // INJECT CSS
+        var css = document.createElement("style");
+        css.type = "text/css";
+        css.innerHTML = ".typewrite > .intro__cursor { border-right: 0.08em solid #007bff}";
+        document.body.appendChild(css);
+        // INJECT CSSs
+    };
+    //typewrite effect
 
-				$nav_a
-					.scrolly({
-						speed: 1000,
-						offset: function() { return $nav.height(); }
-					})
-					.on('click', function() {
+    // const hand = document.querySelector(".emoji.wave-hand");
 
-						var $this = $(this);
+    // function waveOnLoad() {
+    //     hand.classList.add("wave");
+    //     setTimeout(function() {
+    //         hand.classList.remove("wave");
+    //     }, 2000);
+    // }
 
-						// External link? Bail.
-							if ($this.attr('href').charAt(0) != '#')
-								return;
+    // setTimeout(function() {
+    //     waveOnLoad();
+    // }, 1000);
 
-						// Deactivate all links.
-							$nav_a
-								.removeClass('active')
-								.removeClass('active-locked');
+    // hand.addEventListener("mouseover", function() {
+    //     hand.classList.add("wave");
+    // });
 
-						// Activate link *and* lock it (so Scrollex doesn't try to activate other links as we're scrolling to this one's section).
-							$this
-								.addClass('active')
-								.addClass('active-locked');
+    // hand.addEventListener("mouseout", function() {
+    //     hand.classList.remove("wave");
+    // });
 
-					})
-					.each(function() {
+    window.sr = ScrollReveal({
+        reset: false,
+        duration: 600,
+        easing: "cubic-bezier(.694,0,.335,1)",
+        scale: 1,
+        viewFactor: 0.3
+    });
 
-						var	$this = $(this),
-							id = $this.attr('href'),
-							$section = $(id);
-
-						// No section for this link? Bail.
-							if ($section.length < 1)
-								return;
-
-						// Scrollex.
-							$section.scrollex({
-								mode: 'middle',
-								initialize: function() {
-
-									// Deactivate section.
-										if (browser.canUse('transition'))
-											$section.addClass('inactive');
-
-								},
-								enter: function() {
-
-									// Activate section.
-										$section.removeClass('inactive');
-
-									// No locked links? Deactivate all links and activate this section's one.
-										if ($nav_a.filter('.active-locked').length == 0) {
-
-											$nav_a.removeClass('active');
-											$this.addClass('active');
-
-										}
-
-									// Otherwise, if this section's link is the one that's locked, unlock it.
-										else if ($this.hasClass('active-locked'))
-											$this.removeClass('active-locked');
-
-								}
-							});
-
-					});
-
-		}
-
-	// Scrolly.
-		$('.scrolly').scrolly({
-			speed: 1000
-		});
-
-})(jQuery);
+    sr.reveal(".background");
+    sr.reveal(".skills");
+    sr.reveal(".experience", { viewFactor: 0.2 });
+    sr.reveal(".featured-projects", { viewFactor: 0.1 });
+    sr.reveal(".other-projects", { viewFactor: 0.05 });
+});
