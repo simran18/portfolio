@@ -287,8 +287,21 @@ strong {
         padding-left: 30px;
     }
 }
+  
+.navbar {
+    overflow: hidden;
+    position: fixed; /* Set the navbar to fixed position */
+    top: 0; /* Position the navbar at the top of the page */
+    width: 100%; /* Full width */
+    background-color: white;
+  }
+
+.main {
+    margin-top: 100px; /* Add a top margin to avoid content overlay */
+}
+
 .section__content p {
-    margin-top: 0;
+    margin-top: 0px;
     margin-bottom: 25px;
 }
 .section__content .underline-link {
@@ -952,7 +965,6 @@ strong {
 .footer__links a {
     position: relative;
     display: inline-block;
-    color: #007bff !important;
     text-transform: uppercase;
     font-weight: 700;
     margin: 0 15px;
